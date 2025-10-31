@@ -1,18 +1,16 @@
-__version__ = "0.0.1rc4"
+__version__ = "0.0.1rc5"
 import json
 from pathlib import Path
 from ir_datasets import registry
-from lsr_benchmark.irds import build_dataset, MAPPING_OF_DATASET_IDS, ir_datasets_from_tira
+from lsr_benchmark.irds import build_dataset, ir_datasets_from_tira
 from lsr_benchmark.corpus import materialize_corpus, materialize_queries, materialize_qrels
 from click import group, argument
 import lsr_benchmark.click
 
-SUPPORTED_IR_DATASETS = MAPPING_OF_DATASET_IDS.keys()
-
 from ._commands._evaluate import evaluate
 from ._commands._retrieval import retrieval
 from ._commands._download import download_embeddings, download_run
-from .datasets import TIRA_DATASET_ID_TO_IR_DATASET_ID, IR_DATASET_TO_TIRA_DATASET
+from .datasets import TIRA_DATASET_ID_TO_IR_DATASET_ID, IR_DATASET_TO_TIRA_DATASET, SUPPORTED_IR_DATASETS
 import os
 
 

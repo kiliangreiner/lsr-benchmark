@@ -11,11 +11,11 @@ from tira.third_party_integrations import in_tira_sandbox
 from tqdm import tqdm
 import os
 from glob import glob
+from lsr_benchmark.datasets import TIRA_DATASET_ID_TO_IR_DATASET_ID
 
 if TYPE_CHECKING:
     from typing import Optional
 
-MAPPING_OF_DATASET_IDS = {"clueweb09/en/trec-web-2009": "data/trec-18-web"}
 TIRA_LSR_TASK_ID = "lsr-benchmark"
 
 
@@ -80,19 +80,15 @@ def ir_datasets_from_tira(force_reload=False):
     return _IR_DATASETS_FROM_TIRA
 
 
-def extracted_resource(irds_id: str, f) -> Path:
-    if os.path.isdir(irds_id):
-        return Path(irds_id)
-    else:
-        raise ValueError("ToDo: finish refactoring")
-
-
 def _dowload_from_tira(ir_datasets_id, truth_dataset):
     if os.path.isdir(ir_datasets_id):
         return Path(ir_datasets_id)
 
     from tira.rest_api_client import Client
     tira = Client()
+
+    if '-train' not in ir_datasets_id and not in_tira_sandbox() and not tira.api_key_is_valid():
+        raise ValueError(f"The dataset {ir_datasets_id} is private, you can not access the raw data.")
     return tira.download_dataset(task=None, dataset=ir_datasets_id, truth_dataset=truth_dataset)
 
 
@@ -191,13 +187,25 @@ class LsrBenchmarkDataset(Dataset):
 
         if in_tira_sandbox():
             qrels_obj = None
+        
         else:
             class QrelsObj:
                 def stream(self):
                     qrels_file = _dowload_from_tira(ir_datasets_id, True) / "qrels.txt"
                     return qrels_file.open("rb")
 
-            qrels_obj = TrecQrels(QrelsObj(), {0: "Not Relevant", 1: "Relevant"})
+            class TmpTrecQrels(TrecQrels):
+                def qrels_iter(self):
+                    try:
+                        _dowload_from_tira(ir_datasets_id, True)    
+                    except:
+                        import ir_datasets
+                        ds = ir_datasets.load(TIRA_DATASET_ID_TO_IR_DATASET_ID[ir_datasets_id])
+                        yield from ds.qrels_iter()
+                    else:
+                        yield from super().qrels_iter()
+
+            qrels_obj = TmpTrecQrels(QrelsObj(), {0: "Not Relevant", 1: "Relevant"})
 
         if segmented:
             docs = LsrBenchmarkSegmentedDocuments(ir_datasets_id)

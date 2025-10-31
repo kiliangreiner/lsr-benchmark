@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 import click
 from tira.rest_api_client import Client
-from lsr_benchmark.datasets import TIRA_DATASET_ID_TO_IR_DATASET_ID
+from lsr_benchmark.datasets import SUPPORTED_IR_DATASETS
 from lsr_benchmark.irds import TIRA_LSR_TASK_ID
 
 @click.command()
 @click.argument("team")
 def main(team):
     tira = Client()
-    for dataset in list(TIRA_DATASET_ID_TO_IR_DATASET_ID.keys()) + ["tiny-example-20251002_0-training"]:
+    for dataset in SUPPORTED_IR_DATASETS:
         submissions = tira.submissions(TIRA_LSR_TASK_ID, dataset)
         submissions = submissions[submissions["team"] == team]
 
