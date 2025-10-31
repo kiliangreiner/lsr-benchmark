@@ -8,7 +8,7 @@ from lsr_benchmark.irds import TIRA_LSR_TASK_ID
 @click.argument("team")
 def main(team):
     tira = Client()
-    for dataset in TIRA_DATASET_ID_TO_IR_DATASET_ID.keys():
+    for dataset in list(TIRA_DATASET_ID_TO_IR_DATASET_ID.keys()) + ["tiny-example-20251002_0-training"]:
         submissions = tira.submissions(TIRA_LSR_TASK_ID, dataset)
         submissions = submissions[submissions["team"] == team]
 
