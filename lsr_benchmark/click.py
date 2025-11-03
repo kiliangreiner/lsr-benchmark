@@ -28,6 +28,9 @@ def retrieve_command():
         name = "embedding_or_dir"
 
         def convert(self, value, param, ctx):
+            if os.path.isdir(value):
+                return os.path.abspath(value)
+
             if value:
                 value = value.replace("/", "-")
 
