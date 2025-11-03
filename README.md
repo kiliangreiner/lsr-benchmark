@@ -44,7 +44,7 @@ pip3 install git+https://github.com/reneuir/lsr-benchmark.git
 
 # Supported Corpora and Embeddings
 
-Please run `lsr-benchmark overview` for an up-to-date overview over all datasets and all embeddings.
+Please run `lsr-benchmark overview` for an up-to-date overview over all datasets and all embeddings. Alternatively, [online overview in TIRA](https://archive.tira.io/task-overview/lsr-benchmark/) provides an overview.
 
 # Running Tests
 
@@ -117,4 +117,6 @@ Each document consists of a `doc_id` and a list of text `segments` that are shor
 
 # Evaluation
 
-The evaluation methodology encourages the development of diverse and novel measures, as a suitable interpretation of efficiency for a target task highly depends on the application and its context. Therefore, we aim to measure as many XY as possible in a standardized way with the [tirex-tracker](https://github.com/tira-io/tirex-tracker/) to ensure that XY. This methodology and related aspects were developed as part of the [ReNeuIR workshop series](https://reneuir.org/) held at SIGIR [2022](https://dl.acm.org/doi/abs/10.1145/3477495.3531704), [2023](https://dl.acm.org/doi/abs/10.1145/3539618.3591922), [2024](https://dl.acm.org/doi/abs/10.1145/3626772.3657994), and [2025](https://reneuir.org/).
+The [online overview in TIRA](https://archive.tira.io/task-overview/lsr-benchmark/) provides an overview of aggregated evaluations. Alternatively, all data and further custom evaluations are available in the [step-04-evaluation](step-04-evaluation) directory of this repository.
+
+Our evaluation methodology encourages the development of diverse and novel measures for lsr models that take efficiency and effectiveness into consideration. We assume that a suitable interpretation of efficiency for a target task highly depends on the application and its context. Therefore, we aim to measure as many efficiency-oriented aspects as possible in a standardized way with the [tirex-tracker](https://github.com/tira-io/tirex-tracker/) to ensure that different efficiency/effectiveness interpretations can be evaluated post-hoc. This methodology and related aspects were developed as part of the [ReNeuIR workshop series](https://reneuir.org/) held at SIGIR [2022](https://dl.acm.org/doi/abs/10.1145/3477495.3531704), [2023](https://dl.acm.org/doi/abs/10.1145/3539618.3591922), [2024](https://dl.acm.org/doi/abs/10.1145/3626772.3657994), and [2025](https://reneuir.org/).
