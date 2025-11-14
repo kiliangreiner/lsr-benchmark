@@ -19,6 +19,25 @@ def load_docs(ir_datasets_id, subsample):
     print(f"Skipped {skipped} docs")
     return ret
 
+def incorporate_fields(docs, ir_datasets_id, fields):
+    if fields is None or len(fields) == 0:
+        return
+
+    ret = {}
+    docs_store = ir_datasets.load(ir_datasets_id).docs_store()
+
+    skipped = 0
+    for doc_id in tqdm(docs.keys(), "add fields"):
+        try:
+            doc = docs_store.get(doc_id)
+            ret[doc_id] = {k: getattr(doc, k) for k in fields}
+        except:
+            skipped += 1
+    for doc_id in docs.keys():
+        for f in fields:
+            docs[doc_id][f] = ret.get(doc_id, {}).get(f)
+
+
 def irds_id_from_config(config):
     if "ir-datasets-id" not in config:
         from lsr_benchmark.chatnoir import register_subsample_from_chatnoir
@@ -48,6 +67,7 @@ def materialize_corpus(directory, config):
     subsample = create_subsample(config["runs"], ir_datasets_id, config["subsample_depth"], directory)
     docs = load_docs(ir_datasets_id, subsample)
     docs = segmented_document(docs, config.get("passage_size", 200))
+    incorporate_fields(docs, ir_datasets_id, config.get("include-fields"))
     with gzip.open(directory/"corpus.jsonl.gz", 'wt') as f:
         for doc in docs.values():
             f.write(json.dumps(doc) + '\n')
