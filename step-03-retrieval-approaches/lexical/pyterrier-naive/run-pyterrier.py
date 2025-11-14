@@ -11,6 +11,7 @@ from tira.third_party_integrations import ensure_pyterrier_is_loaded,  normalize
 import ir_datasets
 from lsr_benchmark.click import  option_lsr_dataset, option_retrieval_depth
 
+@click.command()
 @option_lsr_dataset()
 @option_retrieval_depth()
 @click.option("--retrieval", type=str, required=False, default="BM25", help="The retrieval model to use.")
