@@ -2,7 +2,7 @@ from pathlib import Path
 from ir_datasets.formats import BaseDocs
 from ir_datasets.indices.base import Docstore
 from ir_datasets import Dataset
-from ir_datasets.formats import TrecQrels, TrecQueries
+from ir_datasets.formats import TrecQrels, TrecXmlQueries
 from ir_datasets.util import StringFile
 from ir_datasets import registry
 import json
@@ -40,13 +40,14 @@ def register_subsample_from_chatnoir(chatnoir_index: str, qrels_file: Path, topi
     if ir_datasets_id in registry:
         return
 
-    
     class ChatNoirDocs(BaseDocs):
         def docs_store(self):
             return cached_chatnoir_docs_store(chatnoir_index, Path(qrels_file).parent.parent / "chatnoir-docs.jsonl.gzip")
+
+    topics = TrecXmlQueries(StringFile(open(topics_file, "r").read()))
     docs = ChatNoirDocs()
     qrels = TrecQrels(StringFile(open(qrels_file, "r").read()), {})
-    topics = TrecQueries(StringFile(open(topics_file, "r").read()))
+
     dataset = Dataset(docs, qrels, topics)
     registry.register(ir_datasets_id, dataset)
     
