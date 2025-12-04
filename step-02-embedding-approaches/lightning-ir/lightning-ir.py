@@ -41,11 +41,11 @@ def main(dataset: str, model: str, batch_size: int, output: Path):
         text_type_save_dir = Path(output) / text_type
 
         with tracking(export_file_path=text_type_save_dir / f"{text_type}-ir-metadata.yml"):
-            output = trainer.predict(model=module, datamodule=datamodule)
+            preds = trainer.predict(model=module, datamodule=datamodule)
 
         embeddings = []
         ids = []
-        for x in output:
+        for x in preds:
             embeddings.append(getattr(x, f"{text_type}_embeddings").embeddings)
             ids.extend(getattr(x, f"{text_type}_embeddings").ids)
 
