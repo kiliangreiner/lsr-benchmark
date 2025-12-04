@@ -20,8 +20,7 @@ def convert_embeddings(embeddings: torch.Tensor):
 @option_lsr_dataset()
 @click.option("--model", type=str, required=True, help="The lightning ir model.")
 @click.option("--batch_size", type=int, default=4, help="Number of queries/documents to process in a batch.")
-@click.option("--save_dir", type=Path, required=True, help="Directory to save output embeddings.")
-def main(dataset: str, model: str, batch_size: int, save_dir: Path):
+def main(dataset: str, model: str, batch_size: int, output: Path):
     # register the dataset with ir_datasets
     lsr_benchmark.register_to_ir_datasets(dataset)
 
@@ -39,7 +38,7 @@ def main(dataset: str, model: str, batch_size: int, save_dir: Path):
         datamodule = LightningIRDataModule(inference_datasets=[Dataset(dataset_id)], inference_batch_size=batch_size)
         # downloads dataset if not already downloaded
         datamodule.prepare_data()
-        text_type_save_dir = save_dir / text_type
+        text_type_save_dir = output / text_type
 
         with tracking(export_file_path=text_type_save_dir / f"{text_type}-ir-metadata.yml"):
             output = trainer.predict(model=module, datamodule=datamodule)

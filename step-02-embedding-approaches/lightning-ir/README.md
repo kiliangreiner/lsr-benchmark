@@ -18,7 +18,7 @@ export HF_HUB_OFFLINE=0
 ./lightning-ir.py \
     --dataset tiny-example-20251002_0-training \
     --model webis/bert-bi-encoder \
-    --save_dir foo
+    --output foo
 ```
 
 ## Submission
@@ -31,7 +31,7 @@ tira-cli code-submission \
     --task lsr-benchmark \
     --tira-vm-id lightning-ir \
     --dataset tiny-example-20251002_0-training \
-    --command '/lightning-ir.py --dataset $inputDataset --save_dir $outputDir --model naver/splade-v3' \
+    --command '/lightning-ir.py --dataset $inputDataset --output $outputDir --model naver/splade-v3' \
     --mount-hf-model naver/splade-v3 \
     --dry-run
 ```
