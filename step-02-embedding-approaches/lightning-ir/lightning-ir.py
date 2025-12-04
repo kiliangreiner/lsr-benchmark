@@ -38,7 +38,7 @@ def main(dataset: str, model: str, batch_size: int, output: Path):
         datamodule = LightningIRDataModule(inference_datasets=[Dataset(dataset_id)], inference_batch_size=batch_size)
         # downloads dataset if not already downloaded
         datamodule.prepare_data()
-        text_type_save_dir = output / text_type
+        text_type_save_dir = Path(output) / text_type
 
         with tracking(export_file_path=text_type_save_dir / f"{text_type}-ir-metadata.yml"):
             output = trainer.predict(model=module, datamodule=datamodule)
