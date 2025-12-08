@@ -39,6 +39,7 @@ class TestIrdsIntegration(unittest.TestCase):
         self.assertEqual(32123, len(list(ds.docs_iter())))
         self.assertEqual(9260, len(list(ds.qrels_iter())))
         self.assertEqual(32123, len(ds.docs_store().keys()))
+        self.assertTrue(ds.docs_store().built())
 
     def test_all_datasets_can_be_loaded(self):
         for i in range(3):

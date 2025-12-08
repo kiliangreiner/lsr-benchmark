@@ -225,9 +225,14 @@ class LsrBenchmarkDataset(Dataset):
         return "lsr-benchmark/" + TIRA_DATASET_ID_TO_IR_DATASET_ID.get(self.__irds_id, self.__irds_id)
 
     def docs_store(self):
-        ret = {}
+        class DocsStore(dict):
+            def built(self):
+                return True
+        ret = DocsStore()
+
         for doc in self.docs_iter():
             ret[doc.doc_id] = doc
+
         return ret
 
 
