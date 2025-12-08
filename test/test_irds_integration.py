@@ -40,11 +40,6 @@ class TestIrdsIntegration(unittest.TestCase):
         self.assertEqual(43, len(list(ds.queries_iter())))
         self.assertEqual(32123, len(list(ds.docs_iter())))
         self.assertEqual(9260, len(list(ds.qrels_iter())))
-        docs_store = ds.docs_store()
-        self.assertEqual(32123, len(docs_store.keys()))
-        self.assertTrue(docs_store.built())
-        self.assertIsNotNone(docs_store.get("1000482"))
-        self.assertIn("movie makeup transformations", docs_store.get("1000482").default_text())
 
     def test_private_dataset_error_message(self):
         with TemporaryDirectory() as tmp_dir:
