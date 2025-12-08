@@ -147,7 +147,6 @@ class LsrBenchmarkQueryEmbedding(NamedTuple):
 class LsrBenchmarkDocuments(BaseDocs):
     def __init__(self, irds_id):
         self.__corpus_file = None
-        self.__docs = None
         self.__irds_id = irds_id
 
     def docs_iter(self):
@@ -155,15 +154,15 @@ class LsrBenchmarkDocuments(BaseDocs):
             yield LsrBenchmarkDocument._from_json(l)
 
     def docs(self):
-        if not self.__docs:
-            if not self.__corpus_file:
-                self.__corpus_file = _dowload_from_tira(self.__irds_id, False) / "corpus.jsonl.gz"
-            reader = JsonlFormat()
-            reader.apply_configuration_and_throw_if_invalid(
-                {"required_fields": ["doc_id", "segments"], "max_size_mb": 2500}
-            )
-            self.__docs = reader.all_lines(self.__corpus_file)
-        return self.__docs
+        if not self.__corpus_file:
+            self.__corpus_file = _dowload_from_tira(self.__irds_id, False) / "corpus.jsonl.gz"
+
+        reader = JsonlFormat()
+        reader.apply_configuration_and_throw_if_invalid(
+            {"required_fields": ["doc_id", "segments"], "max_size_mb": 2500}
+        )
+
+        yield from reader.yield_next_entry(self.__corpus_file)
 
     def docs_count(self):
         return len([1 for i in self.docs_iter()])
