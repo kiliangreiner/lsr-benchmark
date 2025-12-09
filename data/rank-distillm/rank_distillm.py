@@ -5,7 +5,7 @@ from pathlib import Path
 from glob import glob
 from collections import defaultdict
 
-config = json.loads(Path("config.json").read_text())
+config = json.loads(Path("rank-distillm/config.json").read_text())
 runs = []
 
 run_to_queries = {}
@@ -21,7 +21,7 @@ for run, queries in run_to_queries.items():
 
 queries_to_retain = set([i for i, v in query_to_count.items() if v == len(run_to_queries)])
 
-if not Path("subsample.json").exists():
+if not Path("rank-distillm/subsample.json").exists():
     docs = set()
     for run in glob(config["runs"] + "/*"):
         run = TrecRun(run).run_data
@@ -29,12 +29,13 @@ if not Path("subsample.json").exists():
             if i.query in queries_to_retain:
                 docs.add(str(i.docid))
 
-    Path("subsample.json").write_text(json.dumps(sorted(list(docs))))
+    Path("rank-distillm/subsample.json").write_text(json.dumps(sorted(list(docs))))
 
 def register_dataset():
     from ir_datasets import registry
-    ds = as_dataset()
-    registry.register("rank-distillm", ds)
+    if "rank-distillm" not in registry:
+        ds = as_dataset()
+        registry.register("rank-distillm", ds)
 
 def as_dataset():
     import ir_datasets
@@ -62,7 +63,7 @@ def as_dataset():
 
     class RankDistillmDocs():
         def docs_store(self):
-            raise ValueError("asasa")
+            return ds.docs_store()
    
     return Dataset(RankDistillmDocs(), RankDistillmQueries(), RankDistillmQrels())
 
