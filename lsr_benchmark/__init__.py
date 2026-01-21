@@ -5,7 +5,6 @@ from ir_datasets import registry
 from lsr_benchmark.irds import build_dataset, ir_datasets_from_tira
 from lsr_benchmark.corpus import materialize_corpus, materialize_queries, materialize_qrels
 from click import group, argument
-import lsr_benchmark.click
 
 from ._commands._evaluate import evaluate
 from ._commands._retrieval import retrieval

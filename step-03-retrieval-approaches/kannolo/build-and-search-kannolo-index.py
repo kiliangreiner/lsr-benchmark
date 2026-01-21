@@ -6,7 +6,6 @@ import click
 from tqdm import tqdm
 from tirex_tracker import tracking, ExportFormat, register_metadata
 from shutil import rmtree
-from pathlib import Path
 from lsr_benchmark.click import retrieve_command
 import gzip
 import numpy as np
@@ -34,6 +33,7 @@ class KannoloDatasetBuffer():
         self.tokens = np.ascontiguousarray(np.concatenate(self.tokens, dtype=np.int32).flatten())
         self.values = np.ascontiguousarray(np.concatenate(self.values, dtype=np.float32).flatten())
         self.offsets = np.ascontiguousarray(np.array(self.offsets, dtype=np.int32).flatten())
+
 
 @retrieve_command()
 @click.option("--ef-search", type=int, required=False, default=200, help="TBD.")
@@ -85,31 +85,6 @@ def main(dataset, embedding, output, ef_search, k):
                 f.write(f"{qid} Q0 {docno} {rank} {score} kannolo\n")
                 rank += 1
 
-
-class KannoloDatasetBuffer():
-    
-    def __init__(self):
-        self.doc_ids = []
-        self.tokens = []
-        self.values = []
-        self.offsets = [0]
-            
-    def add_document(self, doc_id, tokens, values):
-        self.doc_ids.append(doc_id)
-        self.tokens.append(np.fromiter(map(lambda x: int(x), tokens), dtype=np.int32))  
-        self.values.append(np.fromiter(values, dtype=np.float32))
-        self.offsets.append(self.offsets[-1] + len(tokens))
-    
-    def __len__(self):
-        return len(self.doc_ids)
-
-    def finalize(self):
-        self.doc_ids = np.array(self.doc_ids)
-        self.tokens = np.ascontiguousarray(np.concatenate(self.tokens, dtype=np.int32).flatten())
-        self.values = np.ascontiguousarray(np.concatenate(self.values, dtype=np.float32).flatten())
-        self.offsets = np.ascontiguousarray(np.array(self.offsets, dtype=np.int32).flatten())
-        
-        
 
 if __name__ == "__main__":
     main()

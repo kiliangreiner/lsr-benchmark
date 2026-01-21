@@ -1,21 +1,21 @@
+<!-- markdownlint-disable MD033 MD041 -->
+
 <img width="100%" src="assets/banner.png" alt="The lsr-benchmark banner image">
+
 <h1 align="center">lsr-benchmark</h1>
 
-
-[![CI](https://img.shields.io/github/actions/workflow/status/reneuir/lsr_benchmark/ci.yml?branch=master&style=flat-square)](https://github.com/reneuir/lsr_benchmark/actions/workflows/ci.yml)
-[![Maintenance](https://img.shields.io/maintenance/yes/2025?style=flat-square)](https://github.com/reneuir/lsr_benchmark/graphs/contributors)
-[![Code coverage](https://img.shields.io/codecov/c/github/reneuir/lsr_benchmark?style=flat-square)](https://codecov.io/github/reneuir/lsr_benchmark/)
+[![CI](https://img.shields.io/github/actions/workflow/status/reneuir/lsr-benchmark/ci.yml?branch=master&style=flat-square)](https://github.com/reneuir/lsr-benchmark/actions/workflows/ci.yml)
+[![Maintenance](https://img.shields.io/maintenance/yes/2026?style=flat-square)](https://github.com/reneuir/lsr-benchmark/graphs/contributors)
+[![Code coverage](https://img.shields.io/codecov/c/github/reneuir/lsr-benchmark?style=flat-square)](https://codecov.io/github/reneuir/lsr-benchmark/)
 \
-[![Release](https://img.shields.io/github/v/tag/reneuir/lsr_benchmark?style=flat-square&label=library)](https://github.com/reneuir/lsr_benchmark/releases/)
+[![Release](https://img.shields.io/github/v/tag/reneuir/lsr-benchmark?style=flat-square&label=library)](https://github.com/reneuir/lsr-benchmark/releases/)
 [![PyPi](https://img.shields.io/pypi/v/lsr-benchmark?style=flat-square)](https://pypi.org/project/lsr-benchmark/)
 [![Downloads](https://img.shields.io/pypi/dm/lsr-benchmark?style=flat-square)](https://pypi.org/project/lsr-benchmark/)
-[![Commit activity](https://img.shields.io/github/commit-activity/m/reneuir/lsr_benchmark?style=flat-square)](https://github.com/reneuir/lsr_benchmark/commits)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/reneuir/lsr-benchmark?style=flat-square)](https://github.com/reneuir/lsr-benchmark/commits)
 
 [CLI](#command-line-tool)&emsp;•&emsp;[Python API](#cc-api)&emsp;•&emsp;[Citation](#citation)
 
-**Attention: This is currently under review.**
-
-The lsr-benchmark aims to support holisitc evaluations of the learned sparse retrieval paradigm to contrast efficiency and effectiveness accross diverse retrieval scenarios.
+The lsr-benchmark aims to support holistic evaluations of the learned sparse retrieval paradigm to contrast efficiency and effectiveness across diverse retrieval scenarios.
 
 # Task
 
@@ -30,15 +30,15 @@ You can submit solutions to step 2 (i.e., models that embed documents and querie
 
 # Installation
 
-You can install the lsr_benchmark via:
+You can install the lsr-benchmark via:
 
-```
-pip3 install lsr_benchmark
+```shell
+pip3 install lsr-benchmark
 ```
 
 If you want the latest features, you can install from the main branch:
 
-```
+```shell
 pip3 install git+https://github.com/reneuir/lsr-benchmark.git
 ```
 
@@ -50,7 +50,7 @@ Please run `lsr-benchmark overview` for an up-to-date overview over all datasets
 
 We have a suite of unit tests that you can run via:
 
-```
+```shell
 # first install the local version of the lsr-benchmark
 pip3 install -e .[dev,test]
 # then run the unit tests
@@ -74,7 +74,7 @@ The formats for data inputs and outputs aim to support slicing and dicing divers
 
 You can slice and dice the document texts and document embeddings via the API. The document texts for private corpora are only available within the [TIRA sandbox](https://docs.tira.io/participants/python-client.html) whereas the document embeddings are publicly available for all corpora (as one can not re-construct the original documents from sparse embeddings).
 
-```
+```python
 dataset = lsr_benchmark.load('<IR-DATASETS-ID>')
 
 # process the document embeddings:

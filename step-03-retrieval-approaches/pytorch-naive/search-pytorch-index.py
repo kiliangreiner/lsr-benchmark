@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import gzip
 from array import array
-from pathlib import Path
 from shutil import rmtree
 
 import click

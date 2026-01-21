@@ -1,6 +1,5 @@
 import click
 from tira.rest_api_client import Client
-from pathlib import Path
 from lsr_benchmark.datasets import all_embeddings, all_ir_datasets, IR_DATASET_TO_TIRA_DATASET
 from shutil import copytree
 

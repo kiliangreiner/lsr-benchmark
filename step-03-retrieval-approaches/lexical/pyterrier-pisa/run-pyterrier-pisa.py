@@ -4,14 +4,13 @@ import click
 from tirex_tracker import tracking, ExportFormat, register_metadata
 from tqdm import tqdm
 import pyterrier as pt
-from pathlib import Path
 from shutil import rmtree
 import pandas as pd
 from tira.third_party_integrations import ensure_pyterrier_is_loaded,  normalize_run
 import ir_datasets
 from lsr_benchmark.click import  option_lsr_dataset, option_retrieval_depth
-from math import floor
 from pyterrier_pisa import PisaIndex
+from tempfile import TemporaryDirectory
 
 
 @click.command()
@@ -28,11 +27,11 @@ def main(dataset, output, k, precompute_impact):
 
     documents = [{"docno": i.doc_id, "text": i.default_text()} for i in ir_dataset.docs_iter()]
 
-    with tracking(export_file_path=output / "index-metadata.yml", export_format=ExportFormat.IR_METADATA):
-        rmtree("/tmp/.ignored", ignore_errors=True)
-        index = PisaIndex("/tmp/.ignored")
-        index.index(tqdm(documents, "Index docs"))
-        pipeline = index.bm25(precompute_impact=precompute_impact)
+    with TemporaryDirectory() as tmpdir:
+        with tracking(export_file_path=output / "index-metadata.yml", export_format=ExportFormat.IR_METADATA):
+            index = PisaIndex(tmpdir.name)
+            index.index(tqdm(documents, "Index docs"))
+            pipeline = index.bm25(precompute_impact=precompute_impact)
 
     rmtree(output / ".tirex-tracker")
 

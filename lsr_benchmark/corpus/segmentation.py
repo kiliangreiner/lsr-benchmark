@@ -1,4 +1,3 @@
-from operator import ge
 
 from abc import ABC, abstractmethod
 from tqdm import tqdm

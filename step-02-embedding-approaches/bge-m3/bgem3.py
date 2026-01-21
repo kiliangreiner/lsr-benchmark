@@ -2,8 +2,7 @@
 from pathlib import Path
 import click
 import numpy as np
-import torch
-from lightning_ir import DocDataset, LightningIRDataModule, QueryDataset
+from lightning_ir import DocDataset, QueryDataset
 from tirex_tracker import tracking, register_metadata
 from lsr_benchmark.utils import ClickParamTypeLsrDataset
 import lsr_benchmark

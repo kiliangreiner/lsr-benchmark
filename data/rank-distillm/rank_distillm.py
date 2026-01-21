@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from glob import glob
 from collections import defaultdict
+import ir_datasets
 
 config = json.loads(Path("rank-distillm/config.json").read_text())
 runs = []
@@ -68,7 +69,6 @@ def as_dataset():
     return Dataset(RankDistillmDocs(), RankDistillmQueries(), RankDistillmQrels())
 
 register_dataset()
-import ir_datasets
 ds = ir_datasets.load("rank-distillm")
 
 for i in ds.queries_iter():

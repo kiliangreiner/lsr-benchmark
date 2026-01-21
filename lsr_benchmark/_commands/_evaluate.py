@@ -1,6 +1,5 @@
 import logging
 import re
-from collections import defaultdict
 from glob import glob
 from gzip import GzipFile
 from io import TextIOWrapper
@@ -68,8 +67,8 @@ def __read_metrics(name: str) -> "tuple[dict[str, Metadata], list[ScoredDoc]]":
         name = name.replace('/run.txt.gz', '/')
 
     if Path(name).is_dir():
-        for l in lines_if_valid(Path(name), "ir_metadata"):
-            metadata[l['name'].replace('.', '').split("-")[0]] = l['content']
+        for line in lines_if_valid(Path(name), "ir_metadata"):
+            metadata[line['name'].replace('.', '').split("-")[0]] = line['content']
         if (Path(name) / "run.txt").is_file():
             run = list(ir_measures.read_trec_run((Path(name) / "run.txt").read_text()))
         else:
@@ -147,12 +146,13 @@ def __parse_measure(measure: "str") -> "tuple[str, Literal['ir_measure', 'tirex'
     try:
         return (measure, 'ir_measure', parse_trec_measure(measure)[0])
     except ValueError:
+        # Fall back to non-TREC measures.
         try:
             return (measure, 'ir_measure', ir_measures.parse_measure(measure))
-        except:
-            pass
+        except ValueError:
+            # Fall back to TIREx measures.
+            return (measure, 'tirex', __parse_tirex_measure(measure))
 
-    return (measure, 'tirex', __parse_tirex_measure(measure))
 
 
 def __get_dataset_name(metadata: Dict[str, Any]) -> str:
@@ -221,7 +221,8 @@ def evaluate_approach(approach: str, measure: list[str]):
     dataset = __get_dataset_name(metadata)
     lsr_benchmark.register_to_ir_datasets(dataset)
     dset = lsr_benchmark.load(dataset)
-    assert dset.has_qrels()
+    if not dset.has_qrels():
+        raise ValueError(f"The dataset {dataset} has no qrels.")
 
     ret.update({str(k): v for k, v in ir_measures.calc_aggregate(irmeasures, dset.qrels, run).items()})
     ret["tira-dataset-id"] = dataset
