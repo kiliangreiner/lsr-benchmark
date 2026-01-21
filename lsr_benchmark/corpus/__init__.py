@@ -14,7 +14,7 @@ def load_docs(ir_datasets_id, subsample):
     for doc in tqdm(subsample):
         try:
             ret[doc] = docs_store.get(doc).default_text()[:2000000]
-        except:
+        except Exception:
             skipped += 1
     print(f"Skipped {skipped} docs")
     return ret
@@ -31,7 +31,7 @@ def incorporate_fields(docs, ir_datasets_id, fields):
         try:
             doc = docs_store.get(doc_id)
             ret[doc_id] = {k: getattr(doc, k) for k in fields}
-        except:
+        except Exception:
             skipped += 1
     for doc_id in docs.keys():
         for f in fields:
@@ -88,15 +88,15 @@ def materialize_queries(directory, config):
         dataset = ir_datasets.load(ir_datasets_id)
         queries_mapped_jsonl = [irds_loader.map_query_as_jsonl(query, True) for query in dataset.queries_iter() if query.query_id in allowed_queries]
         with open(output_jsonl, 'w') as f:
-            for l in queries_mapped_jsonl:
-                f.write(l + '\n')
+            for query_json in queries_mapped_jsonl:
+                f.write(query_json + '\n')
 
     if not output_xml.exists():
         dataset = ir_datasets.load(ir_datasets_id)
         queries_mapped_xml = [irds_loader.map_query_as_xml(query, True) for query in dataset.queries_iter() if query.query_id in allowed_queries]
         with open(output_xml, 'w') as f:
-            for l in queries_mapped_xml:
-                f.write(str(l) + '\n')
+            for query_xml in queries_mapped_xml:
+                f.write(str(query_xml) + '\n')
 
 def materialize_qrels(output_qrels, config):
     ir_datasets_id = irds_id_from_config(config)

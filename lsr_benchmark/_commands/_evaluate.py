@@ -67,8 +67,8 @@ def __read_metrics(name: str) -> "tuple[dict[str, Metadata], list[ScoredDoc]]":
         name = name.replace('/run.txt.gz', '/')
 
     if Path(name).is_dir():
-        for l in lines_if_valid(Path(name), "ir_metadata"):
-            metadata[l['name'].replace('.', '').split("-")[0]] = l['content']
+        for line in lines_if_valid(Path(name), "ir_metadata"):
+            metadata[line['name'].replace('.', '').split("-")[0]] = line['content']
         if (Path(name) / "run.txt").is_file():
             run = list(ir_measures.read_trec_run((Path(name) / "run.txt").read_text()))
         else:
@@ -146,12 +146,13 @@ def __parse_measure(measure: "str") -> "tuple[str, Literal['ir_measure', 'tirex'
     try:
         return (measure, 'ir_measure', parse_trec_measure(measure)[0])
     except ValueError:
+        # Fall back to non-TREC measures.
         try:
             return (measure, 'ir_measure', ir_measures.parse_measure(measure))
-        except:
-            pass
+        except ValueError:
+            # Fall back to TIREx measures.
+            return (measure, 'tirex', __parse_tirex_measure(measure))
 
-    return (measure, 'tirex', __parse_tirex_measure(measure))
 
 
 def __get_dataset_name(metadata: Dict[str, Any]) -> str:

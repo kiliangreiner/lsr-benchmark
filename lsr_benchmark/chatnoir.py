@@ -14,12 +14,13 @@ def cached_chatnoir_docs_store(chatnoir_index: str, cache_file: Path):
     doc_id_to_doc = {}
 
     with gzip.open(cache_file, "rt") as f:
-        for l in f:
+        for line in f:
             try:
-                l = json.loads(l)
-            except:
+                doc = json.loads(line)
+            except Exception:
+                print(f"Warning: Could not parse line in cache file: {line}")
                 continue
-            doc_id_to_doc[l["doc_id"]] = ChatNoirOwiDoc(l["doc_id"], l["text"], l["url"], l["main_content"], l["title"], l["description"])
+            doc_id_to_doc[doc["doc_id"]] = ChatNoirOwiDoc(doc["doc_id"], doc["text"], doc["url"], doc["main_content"], doc["title"], doc["description"])
             
 
     class CachedChatNoirDocsStore(Docstore):

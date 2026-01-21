@@ -1,14 +1,15 @@
 import click
-import os
 import sys
-from tira.io_utils import _fmt, log_message, verify_tira_installation
+from tira.io_utils import log_message, verify_tira_installation, FormatMsgType
 from tira.third_party_integrations import temporary_directory
-from tira.check_format import _fmt, check_format
+from tira.check_format import check_format
 from tira.rest_api_client import Client
 from pathlib import Path
 from lsr_benchmark.datasets import all_embeddings, all_datasets
 import shutil
 import yaml
+from subprocess import Popen
+from platform import system
 
 
 def run_foo(docker_image, command, dataset_id, embedding, output_dir=None):
@@ -31,7 +32,7 @@ def run_foo(docker_image, command, dataset_id, embedding, output_dir=None):
     )
 
     result, msg = check_format(Path(tmp_dir), ["run.txt"], {})
-    if result != _fmt.OK:
+    if result != FormatMsgType.OK:
         print(msg)
         raise ValueError(msg)
 
@@ -75,10 +76,10 @@ def retrieval(approaches: list[str], dataset: list[str], embedding: list[str], o
 
     def print_message(message, level):
         all_messages.append((message, level))
-        os.system("cls" if os.name == "nt" else "clear")
+        Popen("cls" if system() == "Windows" else "clear", shell=True)  # noqa: S602
         print(' '.join([sys.argv[0].split('/')[-1]] + sys.argv[1:]))
-        for m, l in all_messages:
-            log_message(m, l)
+        for message, level in all_messages:
+            log_message(message, level)
 
     if dataset is None or not dataset or "all" in dataset:
         dataset = all_datasets()
@@ -90,11 +91,11 @@ def retrieval(approaches: list[str], dataset: list[str], embedding: list[str], o
 
     status = verify_tira_installation()
 
-    if status != _fmt.OK:
+    if status != FormatMsgType.OK:
         print_message("Your TIRA installation is not valid. Please run 'tira-cli verify-installation' to resolve the problem", status)
         return 1
 
-    print_message("Your TIRA installation is valid.", _fmt.OK)
+    print_message("Your TIRA installation is valid.", FormatMsgType.OK)
     
     tira = Client()
     approach_to_execution = {}
@@ -106,9 +107,9 @@ def retrieval(approaches: list[str], dataset: list[str], embedding: list[str], o
             raise ValueError(f"Approach {approach} produces a docker tag that is already used by another approach.")
         cmd = (Path(approach) / "README.md").read_text().split("tira-cli code-submission")[1].split('--command')[1].split("'")[1]
 
-        log_message(f"Approach {approach} is compiled.", _fmt.OK)
+        log_message(f"Approach {approach} is compiled.", FormatMsgType.OK)
         system_tag = run_foo(docker_tag, cmd, 'tiny-example-20251002_0-training', embedding[0])
-        print_message(f"Approach {approach} compiled and produced valid outputs on example dataset (tag={system_tag}).", _fmt.OK)
+        print_message(f"Approach {approach} compiled and produced valid outputs on example dataset (tag={system_tag}).", FormatMsgType.OK)
         approach_to_execution[approach] = {"tag": docker_tag, "command": cmd}
 
     stats = {}
@@ -118,14 +119,9 @@ def retrieval(approaches: list[str], dataset: list[str], embedding: list[str], o
                 out_dir = Path(out) / d / e / approach
                 try:
                     run_foo(approach_to_execution[approach]["tag"], approach_to_execution[approach]["command"], d, e, out_dir)
-                except:
+                except Exception:  # noqa: S112
                     continue
-                    log_message(f"Approach {approach} finished on {d} for embedding {e}", _fmt.OK)
-                    if approach not in stats:
-                        stats[approach] = {"datasets": set(), "embeddings": set()}
-                    stats[approach]["datasets"].add(d)
-                    stats[approach]["embeddings"].add(e)
     for approach in stats:
-        print_message(f"Approach {approach} produced valid outputs on {len(stats[approach]['datasets'])} datasets for {len(stats[approach]['embeddings'])} embeddings.", _fmt.OK)
+        print_message(f"Approach {approach} produced valid outputs on {len(stats[approach]['datasets'])} datasets for {len(stats[approach]['embeddings'])} embeddings.", FormatMsgType.OK)
     
     return 0

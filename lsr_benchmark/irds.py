@@ -47,8 +47,8 @@ def embeddings(
         from tirex_tracker import register_file
         for i in glob(f"{embedding_dir}/*.yml") + glob(f"{embedding_dir}/*.yaml"):
             register_file(embedding_dir, i.split("/")[-1], subdirectory=".embedding")
-    except:
-        pass
+    except Exception as e:
+        print(f"Warning: Could not register file due to: {e}")
 
     ids = (embedding_dir / f"{text_type}-ids.txt").read_text().strip().split("\n")
 
@@ -134,8 +134,8 @@ class LsrBenchmarkQueries(BaseQueries):
         if not self.__queries_file:
             self.__queries_file = _dowload_from_tira(self.__irds_id, False) / "queries.jsonl"
 
-        for l in QueryProcessorFormat().all_lines(self.__queries_file):
-            yield GenericQuery(l["qid"], l["query"])
+        for q in QueryProcessorFormat().all_lines(self.__queries_file):
+            yield GenericQuery(q["qid"], q["query"])
 
 
 class LsrBenchmarkQueryEmbedding(NamedTuple):
@@ -149,8 +149,8 @@ class LsrBenchmarkDocuments(BaseDocs):
         self.__irds_id = irds_id
 
     def docs_iter(self):
-        for l in self.docs():
-            yield LsrBenchmarkDocument._from_json(l)
+        for doc in self.docs():
+            yield LsrBenchmarkDocument._from_json(doc)
 
     def docs(self):
         if not self.__corpus_file:
@@ -196,7 +196,8 @@ class LsrBenchmarkDataset(Dataset):
                 def qrels_iter(self):
                     try:
                         _dowload_from_tira(ir_datasets_id, True)    
-                    except:
+                    except Exception:
+                        # Dataser could no be found on TIRA, fallback to ir_datasets
                         import ir_datasets
                         ds = ir_datasets.load(TIRA_DATASET_ID_TO_IR_DATASET_ID[ir_datasets_id])
                         yield from ds.qrels_iter()
@@ -239,8 +240,8 @@ def build_dataset(ir_datasets_id: str, segmented: bool):
     try:
         from tirex_tracker import register_metadata
         register_metadata({"data": {"test collection": {"name": ir_datasets_id}}})
-    except:
-        pass
+    except Exception as e:
+        print(f"Warning: Could not register metadata due to: {e}")
 
     return LsrBenchmarkDataset(
         ir_datasets_id=ir_datasets_id,

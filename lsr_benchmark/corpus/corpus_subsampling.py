@@ -104,8 +104,8 @@ def create_subsample(run_dir, ir_datasets_id, depth, output_dir):
         for i in tqdm(glob(f"{run_dir}/*"), "Load Runs"):
             try:
                 runs.append(TrecRun(i))
-            except:
-                pass
+            except Exception as e:
+                print(f"Warning: Could not load run due to: {e}")
         corpus = list(RunPoolCorpusSampler(depth).sample_corpus(ir_datasets_id, runs))
         with open(f"{output_dir}/subsample.json", "w") as f:
             f.write(json.dumps(corpus))
