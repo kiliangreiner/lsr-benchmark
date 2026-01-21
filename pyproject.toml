@@ -68,7 +68,7 @@ build-backend = "setuptools.build_meta"
 include-package-data = true
 
 [tool.setuptools.packages.find]
-exclude = ["assets"]
+exclude = ["assets", "build"]
 
 [tool.setuptools.package-data]
 "*" = ["*.txt", "*.md", "*.rst", "*.json"]
@@ -76,7 +76,7 @@ exclude = ["assets"]
 [tool.setuptools_scm]
 
 [tool.ruff]
-exclude = ["assets"]
+exclude = ["assets", "build"]
 line-length = 120
 
 [tool.ruff.lint]
