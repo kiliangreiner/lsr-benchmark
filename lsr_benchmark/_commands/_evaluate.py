@@ -220,7 +220,8 @@ def evaluate_approach(approach: str, measure: list[str]):
     dataset = __get_dataset_name(metadata)
     lsr_benchmark.register_to_ir_datasets(dataset)
     dset = lsr_benchmark.load(dataset)
-    assert dset.has_qrels()
+    if not dset.has_qrels():
+        raise ValueError(f"The dataset {dataset} has no qrels.")
 
     ret.update({str(k): v for k, v in ir_measures.calc_aggregate(irmeasures, dset.qrels, run).items()})
     ret["tira-dataset-id"] = dataset

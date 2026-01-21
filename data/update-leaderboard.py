@@ -31,7 +31,8 @@ DATASET_TO_AGGREGATION = {
 def ndcg(df, group):
     df = df.copy()
     df = df[df["tira-dataset-id"].isin(set(DATASET_TO_AGGREGATION[group]))]
-    assert len(df) == len(set(DATASET_TO_AGGREGATION[group]))
+    if len(df) != len(set(DATASET_TO_AGGREGATION[group])):
+        raise ValueError(f"Expected results for all datasets in group {group}.")
     return int(df["nDCG@10"].mean()*1000)/1000
 
 def embedding_model_results():

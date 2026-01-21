@@ -7,7 +7,6 @@ from seismic import SeismicIndex, SeismicDataset, SeismicDatasetLV, SeismicIndex
 from tqdm import tqdm
 from tirex_tracker import tracking, ExportFormat, register_metadata
 from shutil import rmtree
-from pathlib import Path
 import gzip
 
 

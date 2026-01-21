@@ -102,7 +102,8 @@ def retrieval(approaches: list[str], dataset: list[str], embedding: list[str], o
         docker_tag, zipped_code, remotes, commit, active_branch = tira.build_docker_image_from_code(
             Path(approach), log_message, False
         )
-        assert docker_tag not in approach_to_execution.values()
+        if docker_tag in approach_to_execution.values():
+            raise ValueError(f"Approach {approach} produces a docker tag that is already used by another approach.")
         cmd = (Path(approach) / "README.md").read_text().split("tira-cli code-submission")[1].split('--command')[1].split("'")[1]
 
         log_message(f"Approach {approach} is compiled.", _fmt.OK)
