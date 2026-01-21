@@ -19,8 +19,8 @@ from pyserini.setup import configure_classpath
 pyserini_path = os.path.dirname(pyserini_file)
 configure_classpath(os.path.join(pyserini_path, "resources/jars"))
 
-from pyserini.encode import QueryEncoder
-from pyserini.search.lucene import LuceneImpactSearcher
+from pyserini.encode import QueryEncoder  # noqa: E402
+from pyserini.search.lucene import LuceneImpactSearcher  # noqa: E402
 
 AGGREGATION_TYPES = ["FirstP", "MaxP", "MaxToken"]
 
