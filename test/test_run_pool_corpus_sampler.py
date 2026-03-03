@@ -1,10 +1,10 @@
-# The code is taken from https://github.com/webis-de/ecir25-corpus-subsampling/blob/main/tests/test_run_pool_corpus_sampler.py
-import unittest
+# The code is adapted from https://github.com/webis-de/ecir25-corpus-subsampling/blob/main/tests/test_run_pool_corpus_sampler.py
 
 import pandas as pd
 from trectools import TrecRun
 
 from lsr_benchmark.corpus.corpus_subsampling import RunPoolCorpusSampler
+
 DATASET_ID_FOR_TEST = "disks45/nocr/trec-robust-2004"
 RUN_WITH_NO_OVERLAPPING_DOCUMENTS = TrecRun()
 RUN_WITH_NO_OVERLAPPING_DOCUMENTS.run_data = pd.DataFrame(
@@ -24,57 +24,63 @@ RUN_WITH_OVERLAPPING_DOCUMENTS.run_data = pd.DataFrame(
 
 SIZE_POOL_ROBUST_04 = 174787
 
-class TestJudgmentPoolCorpusSampler(unittest.TestCase):
-    def test_with_empty_runs(self):
-        sampler = RunPoolCorpusSampler(depth=100)
 
-        actual = sampler.sample_corpus(DATASET_ID_FOR_TEST, [])
+def test_with_empty_runs() -> None:
+    sampler = RunPoolCorpusSampler(depth=100)
 
-        # should be the complete judgment pool
-        self.assertEqual(SIZE_POOL_ROBUST_04, len(actual))
+    actual = sampler.sample_corpus(DATASET_ID_FOR_TEST, [])
 
-    def test_with_run_without_overlapping_doc_ids(self):
-        expected = set(["does-not-exist"])
-        sampler = RunPoolCorpusSampler(depth=100)
+    # should be the complete judgment pool
+    assert SIZE_POOL_ROBUST_04 == len(actual)
 
-        actual = sampler.sample_corpus(DATASET_ID_FOR_TEST, [RUN_WITH_NO_OVERLAPPING_DOCUMENTS])
 
-        for i in expected:
-            self.assertIn(i, actual)
+def test_with_run_without_overlapping_doc_ids() -> None:
+    expected = set(["does-not-exist"])
+    sampler = RunPoolCorpusSampler(depth=100)
 
-        self.assertEqual(SIZE_POOL_ROBUST_04+1, len(actual))
+    actual = sampler.sample_corpus(DATASET_ID_FOR_TEST, [RUN_WITH_NO_OVERLAPPING_DOCUMENTS])
 
-    def test_with_run_with_overlapping_doc_ids(self):
-        expected = set(["FBIS4-57944-XXX", "FR940413-2-00131-XXX", "LA011890-0177-XXX"])
-        sampler = RunPoolCorpusSampler(depth=100)
+    for i in expected:
+        assert i in actual
 
-        actual = sampler.sample_corpus(DATASET_ID_FOR_TEST, [RUN_WITH_OVERLAPPING_DOCUMENTS])
+    assert SIZE_POOL_ROBUST_04 + 1 == len(actual)
 
-        for i in expected:
-            self.assertIn(i, actual)
-        self.assertEqual(SIZE_POOL_ROBUST_04+3, len(actual))
 
-    def test_with_multiple_runs(self):
-        expected = set(["FBIS4-57944-XXX", "FR940413-2-00131-XXX", "LA011890-0177-XXX", "does-not-exist"])
-        sampler = RunPoolCorpusSampler(depth=100)
+def test_with_run_with_overlapping_doc_ids() -> None:
+    expected = set(["FBIS4-57944-XXX", "FR940413-2-00131-XXX", "LA011890-0177-XXX"])
+    sampler = RunPoolCorpusSampler(depth=100)
 
-        actual = sampler.sample_corpus(
-            DATASET_ID_FOR_TEST, [RUN_WITH_OVERLAPPING_DOCUMENTS, RUN_WITH_NO_OVERLAPPING_DOCUMENTS]
-        )
-        
-        for i in expected:
-            self.assertIn(i, actual)
+    actual = sampler.sample_corpus(DATASET_ID_FOR_TEST, [RUN_WITH_OVERLAPPING_DOCUMENTS])
 
-        self.assertEqual(SIZE_POOL_ROBUST_04+4, len(actual))
+    for i in expected:
+        assert i in actual
 
-    def test_string_representation_depth_10(self):
-        expected = "top-10-run-pool"
-        actual = str(RunPoolCorpusSampler(depth=10))
+    assert SIZE_POOL_ROBUST_04 + 3 == len(actual)
 
-        self.assertEqual(expected, actual)
 
-    def test_string_representation_depth_100(self):
-        expected = "top-100-run-pool"
-        actual = str(RunPoolCorpusSampler(depth=100))
+def test_with_multiple_runs() -> None:
+    expected = set(["FBIS4-57944-XXX", "FR940413-2-00131-XXX", "LA011890-0177-XXX", "does-not-exist"])
+    sampler = RunPoolCorpusSampler(depth=100)
 
-        self.assertEqual(expected, actual)
+    actual = sampler.sample_corpus(
+        DATASET_ID_FOR_TEST, [RUN_WITH_OVERLAPPING_DOCUMENTS, RUN_WITH_NO_OVERLAPPING_DOCUMENTS]
+    )
+
+    for i in expected:
+        assert i in actual
+
+    assert SIZE_POOL_ROBUST_04 + 4 == len(actual)
+
+
+def test_string_representation_depth_10() -> None:
+    expected = "top-10-run-pool"
+    actual = str(RunPoolCorpusSampler(depth=10))
+
+    assert expected == actual
+
+
+def test_string_representation_depth_100() -> None:
+    expected = "top-100-run-pool"
+    actual = str(RunPoolCorpusSampler(depth=100))
+
+    assert expected == actual

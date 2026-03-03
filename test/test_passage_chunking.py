@@ -1,26 +1,34 @@
-import unittest
-import json
+from json import load as json_load
 from pathlib import Path
+from typing import Iterator
+
 from approvaltests import verify_as_json
+from pytest import fixture
+from spacy import cli
+
 from lsr_benchmark.corpus.segmentation import segmented_document
 
-def load_docs():
+
+def load_docs() -> dict[str, str]:
     ret = {}
     for i in ["1", "2"]:
-        ret[i] = json.loads((Path(__file__).parent / "resources" / f"example-dl-0{i}.json").read_text())["text"]
+        with (Path(__file__).parent / "resources" / f"example-dl-0{i}.json").open("rb") as file:
+            ret[i] = json_load(file)["text"]
     return ret
 
-class TestPassageChunking(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        import spacy.cli
-        spacy.cli.download("en_core_web_sm")
 
-    def test_load_docs(self):
-        docs = load_docs()
-        self.assertIsNotNone(docs)
+@fixture
+def setup_spacy() -> Iterator[None]:
+    cli.download("en_core_web_sm")
+    yield None
 
-    def test_chunking(self):
-        docs = load_docs()
-        actual = segmented_document(docs, 200)
-        verify_as_json(actual)
+
+def test_load_docs(setup_spacy) -> None:
+    docs = load_docs()
+    assert docs is not None
+
+
+def test_chunking(setup_spacy) -> None:
+    docs = load_docs()
+    actual = segmented_document(docs, 200)
+    verify_as_json(actual)
