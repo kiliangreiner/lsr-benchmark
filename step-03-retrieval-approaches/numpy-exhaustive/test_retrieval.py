@@ -5,8 +5,8 @@ from numpy_exhaustive_search import retrieve
 
 class TestRetrieve(unittest.TestCase):
 
-    def test_01_gleiche_vektoren_topresult(self):
-        """Identischer Vektor soll als erstes Ergebnis kommen."""
+    def test_01_identical_vector_is_top_result(self):
+        """Identical vector should be returned as the top result."""
         query_ids = ["q1"]
         query_embeddings = np.array([[1.0, 0.0, 0.0]])
         doc_ids = ["d1", "d2", "d3"]
@@ -18,8 +18,8 @@ class TestRetrieve(unittest.TestCase):
         results = retrieve(query_ids, query_embeddings, doc_ids, doc_embeddings, k=3)
         self.assertEqual(results[0][0][2], "d1")
 
-    def test_02_topk_wird_eingehalten(self):
-        """Retrieve gibt maximal k Ergebnisse zurück."""
+    def test_02_topk_is_respected(self):
+        """Retrieve should return at most k results."""
         query_ids = ["q1"]
         query_embeddings = np.array([[1.0, 0.0]])
         doc_ids = ["d1", "d2", "d3", "d4"]
@@ -32,8 +32,8 @@ class TestRetrieve(unittest.TestCase):
         results = retrieve(query_ids, query_embeddings, doc_ids, doc_embeddings, k=2)
         self.assertLessEqual(len(results[0]), 2)
 
-    def test_03_scores_absteigend_sortiert(self):
-        """Ergebnisse sind nach Score absteigend sortiert."""
+    def test_03_scores_sorted_descending(self):
+        """Results should be sorted by score in descending order."""
         query_ids = ["q1"]
         query_embeddings = np.array([[1.0, 0.0]])
         doc_ids = ["d1", "d2", "d3"]
@@ -46,26 +46,26 @@ class TestRetrieve(unittest.TestCase):
         scores = [r[1] for r in results[0]]
         self.assertEqual(scores, sorted(scores, reverse=True))
 
-    def test_04_query_id_korrekt(self):
-        """Query-ID wird korrekt in Ergebnisse übernommen."""
-        query_ids = ["meine-query"]
+    def test_04_query_id_correct(self):
+        """Query ID should be correctly included in results."""
+        query_ids = ["my-query"]
         query_embeddings = np.array([[1.0, 0.0]])
         doc_ids = ["d1"]
         doc_embeddings = np.array([[1.0, 0.0]])
         results = retrieve(query_ids, query_embeddings, doc_ids, doc_embeddings, k=1)
-        self.assertEqual(results[0][0][0], "meine-query")
+        self.assertEqual(results[0][0][0], "my-query")
 
-    def test_05_doc_id_korrekt(self):
-        """Doc-ID des besten Dokuments wird korrekt zurückgegeben."""
+    def test_05_doc_id_correct(self):
+        """Doc ID of the best document should be correctly returned."""
         query_ids = ["q1"]
         query_embeddings = np.array([[1.0, 0.0]])
-        doc_ids = ["bestes-doc", "schlechtes-doc"]
+        doc_ids = ["best-doc", "worst-doc"]
         doc_embeddings = np.array([[1.0, 0.0], [0.0, 1.0]])
         results = retrieve(query_ids, query_embeddings, doc_ids, doc_embeddings, k=2)
-        self.assertEqual(results[0][0][2], "bestes-doc")
+        self.assertEqual(results[0][0][2], "best-doc")
 
-    def test_06_mehrere_queries(self):
-        """Mehrere Queries werden alle korrekt verarbeitet."""
+    def test_06_multiple_queries(self):
+        """Multiple queries should all be processed correctly."""
         query_ids = ["q1", "q2"]
         query_embeddings = np.array([[1.0, 0.0], [0.0, 1.0]])
         doc_ids = ["d1", "d2"]
@@ -75,8 +75,8 @@ class TestRetrieve(unittest.TestCase):
         self.assertEqual(results[0][0][2], "d1")
         self.assertEqual(results[1][0][2], "d2")
 
-    def test_07_score_identischer_vektoren_ist_1(self):
-        """Score von identischen normalisierten Vektoren ist 1.0."""
+    def test_07_score_of_identical_vectors_is_1(self):
+        """Score of identical normalized vectors should be 1.0."""
         query_ids = ["q1"]
         query_embeddings = np.array([[1.0, 0.0, 0.0]])
         doc_ids = ["d1"]
@@ -84,8 +84,8 @@ class TestRetrieve(unittest.TestCase):
         results = retrieve(query_ids, query_embeddings, doc_ids, doc_embeddings, k=1)
         self.assertAlmostEqual(results[0][0][1], 1.0, places=5)
 
-    def test_08_score_orthogonaler_vektoren_ist_0(self):
-        """Score von orthogonalen Vektoren ist 0 – taucht nicht in Ergebnissen auf."""
+    def test_08_score_of_orthogonal_vectors_is_0(self):
+        """Score of orthogonal vectors should be 0 and not appear in results."""
         query_ids = ["q1"]
         query_embeddings = np.array([[1.0, 0.0]])
         doc_ids = ["d1"]

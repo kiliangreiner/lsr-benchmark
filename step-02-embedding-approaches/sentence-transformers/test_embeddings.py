@@ -39,15 +39,15 @@ class TestEmbeddings(unittest.TestCase):
         cls.n_dims = 1024
 
     def _save_embeddings(self, d, texts, ids, text_type="doc"):
-        """Hilfsfunktion: Embeddings in korrekte Verzeichnisstruktur speichern."""
+        """Helper: save embeddings in the correct directory structure."""
         type_dir = Path(d) / text_type
         type_dir.mkdir(exist_ok=True)
         output = type_dir / f"{text_type}-embeddings.npz"
         embedd_text_with_model(self.model, texts, ids, output)
         return type_dir
 
-    def test_01_embedding_speichern_und_laden(self):
-        """Test: Embeddings speichern und wieder laden gibt gleiche Vektoren zurück."""
+    def test_01_embeddings_save_and_load(self):
+        """Saving and loading embeddings should return identical vectors."""
         with TemporaryDirectory() as d:
             self._save_embeddings(d, self.texts, self.ids)
             loaded = load_embeddings("dummy", d, "doc")
@@ -61,23 +61,23 @@ class TestEmbeddings(unittest.TestCase):
             self.assertAlmostEqual(similarities[1], 1.0, places=5)
             self.assertAlmostEqual(similarities[2], 1.0, places=5)
 
-    def test_02_ids_korrekt_gespeichert(self):
-        """Test: IDs werden korrekt gespeichert und geladen."""
+    def test_02_ids_saved_correctly(self):
+        """IDs should be saved and loaded correctly."""
         with TemporaryDirectory() as d:
             self._save_embeddings(d, self.texts, self.ids)
             loaded = load_embeddings("dummy", d, "doc")
             loaded_ids = [doc_id for doc_id, _, _ in loaded]
             self.assertEqual(loaded_ids, self.ids)
 
-    def test_03_anzahl_embeddings_korrekt(self):
-        """Test: Anzahl der gespeicherten Embeddings stimmt mit Anzahl der Texte überein."""
+    def test_03_number_of_embeddings_correct(self):
+        """Number of saved embeddings should match number of input texts."""
         with TemporaryDirectory() as d:
             self._save_embeddings(d, self.texts, self.ids)
             loaded = load_embeddings("dummy", d, "doc")
             self.assertEqual(len(loaded), len(self.texts))
 
-    def test_04_einzelner_text(self):
-        """Test: Auch ein einzelner Text funktioniert korrekt."""
+    def test_04_single_text(self):
+        """A single text should also be embedded correctly."""
         with TemporaryDirectory() as d:
             self._save_embeddings(d, ['single text'], ['id-1'])
             loaded = load_embeddings("dummy", d, "doc")
@@ -87,8 +87,8 @@ class TestEmbeddings(unittest.TestCase):
             similarities = calculate_similarity(target, actual)
             self.assertAlmostEqual(similarities[0], 1.0, places=5)
 
-    def test_05_verschiedene_texte_haben_verschiedene_embeddings(self):
-        """Test: Verschiedene Texte erzeugen verschiedene Embeddings."""
+    def test_05_different_texts_have_different_embeddings(self):
+        """Different texts should produce different embeddings."""
         with TemporaryDirectory() as d:
             self._save_embeddings(d, self.texts, self.ids)
             loaded = load_embeddings("dummy", d, "doc")
