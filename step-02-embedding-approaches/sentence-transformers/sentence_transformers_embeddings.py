@@ -3,7 +3,7 @@ from pathlib import Path
 import click
 import numpy as np
 from sentence_transformers import SentenceTransformer
-from tirex_tracker import register_metadata
+from tirex_tracker import register_metadata, start_tracking, stop_tracking
 import lsr_benchmark
 from lsr_benchmark.click import option_lsr_dataset
 import ir_datasets
@@ -21,12 +21,7 @@ def convert_embeddings_dense(embeddings: np.ndarray):
 def embedd_text_with_model(model, texts, ids, output):
     embeddings = model.encode(texts, show_progress_bar=True, normalize_embeddings=True)
     data, indices, indptr = convert_embeddings_dense(embeddings)
-    np.savez_compressed(
-        output,
-        data=data,
-        indices=indices,
-        indptr=indptr,
-    )
+    np.savez_compressed(output, data=data, indices=indices, indptr=indptr)
     Path(str(output).replace("-embeddings.npz", "-ids.txt")).write_text("\n".join(ids))
 
 
@@ -47,14 +42,18 @@ def main(dataset: str, model: str, batch_size: int, output: Path):
     query_save_dir.mkdir(parents=True, exist_ok=True)
     texts = [q.text for q in ir_dataset.queries_iter()]
     ids = [q.query_id for q in ir_dataset.queries_iter()]
+    handle = start_tracking(export_file_path=query_save_dir / "query-ir-metadata.yml")
     embedd_text_with_model(module, texts, ids, query_save_dir / "query-embeddings.npz")
+    stop_tracking(handle)
 
     # Docs embedden
     doc_save_dir = Path(output) / "doc"
     doc_save_dir.mkdir(parents=True, exist_ok=True)
     texts = [d.default_text() for d in ir_dataset.docs_iter()]
     ids = [d.doc_id for d in ir_dataset.docs_iter()]
+    handle = start_tracking(export_file_path=doc_save_dir / "doc-ir-metadata.yml")
     embedd_text_with_model(module, texts, ids, doc_save_dir / "doc-embeddings.npz")
+    stop_tracking(handle)
 
 
 if __name__ == "__main__":
