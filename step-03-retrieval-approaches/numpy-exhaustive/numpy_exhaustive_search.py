@@ -3,14 +3,14 @@ import gzip
 from pathlib import Path
 import click
 import numpy as np
-from tirex_tracker import ExportFormat, register_metadata, start_tracking, stop_tracking
+from tirex_tracker import ExportFormat, register_metadata, tracking
 import lsr_benchmark
 from lsr_benchmark.click import retrieve_command
 from lsr_benchmark.irds import embeddings as load_embeddings
 
 
 def retrieve(query_ids, query_embeddings, doc_ids, doc_embeddings, k):
-    """Exhaustive Cosine Similarity Retrieval mit numpy."""
+    """Exhaustive Cosine Similarity Retrieval with numpy."""
     results = []
     for query_id, query_vec in zip(query_ids, query_embeddings):
         scores = np.dot(doc_embeddings, query_vec) / (
@@ -48,14 +48,12 @@ def main(dataset, embedding, output, k):
         "tag": f"numpy-exhaustive-{embedding.replace('/', '-')}-{k}",
     })
 
-    handle = start_tracking(export_file_path=output / "index-metadata.yml", export_format=ExportFormat.IR_METADATA)
-    doc_ids, doc_embeddings = to_numpy_array(load_embeddings(dataset, embedding, "doc"))
-    stop_tracking(handle)
+    with tracking(export_file_path=output / "index-metadata.yml", export_format=ExportFormat.IR_METADATA):
+        doc_ids, doc_embeddings = to_numpy_array(load_embeddings(dataset, embedding, "doc"))
 
-    handle = start_tracking(export_file_path=output / "retrieval-metadata.yml", export_format=ExportFormat.IR_METADATA)
-    query_ids, query_embeddings = to_numpy_array(load_embeddings(dataset, embedding, "query"))
-    results = retrieve(query_ids, query_embeddings, doc_ids, doc_embeddings, k)
-    stop_tracking(handle)
+    with tracking(export_file_path=output / "retrieval-metadata.yml", export_format=ExportFormat.IR_METADATA):
+        query_ids, query_embeddings = to_numpy_array(load_embeddings(dataset, embedding, "query"))
+        results = retrieve(query_ids, query_embeddings, doc_ids, doc_embeddings, k)
 
     with gzip.open(output / "run.txt.gz", "wt") as f:
         for ranking_for_query in results:
